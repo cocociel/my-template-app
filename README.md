@@ -18,13 +18,17 @@
 
 ```text
 src/
-├── app/             # ルーティング・ページ本体 (page.tsx, layout.tsx)
-├── components/      # 再利用可能なUIコンポーネント
-│   ├── layouts/     # ヘッダー・フッターなど
-│   └── ui/          # ボタン・入力欄など最小単位のパーツ
-├── hooks/           # カスタムフック
-├── lib/             # ユーティリティ関数・設定 (utils.ts, db.tsなど)
-└── types/           # 型定義ファイル
+├── app/
+├── components/
+├── hooks/
+├── lib/
+│   ├── supabase/
+│   │   ├── client.ts
+│   │   └── server.ts
+│   └── utils.ts
+├── types/
+│   └── supabase.ts
+└── middleware.ts
 ```
 
 ## 🛠️ 開発のポイント・ルール（Memo）
@@ -100,6 +104,56 @@ cp .env.example .env.local
 - **Word Wrap**: エディタの右端でコードを折り返し表示（横スクロール防止）。
 
 - **CSS Validation**: Tailwind の独自記法（@tailwind, @apply）による警告を抑制。
+
+---
+
+### Supabase (Database & Auth)
+
+このテンプレートには `@supabase/ssr` がセットアップ済みです。
+
+**セットアップ手順:**
+
+1. Supabase でプロジェクトを作成。
+2. `.env.local` に URL と ANON KEY を設定。
+
+**使い方:**
+
+Next.js の仕様上、クライアント側（ブラウザ）とサーバー側でインスタンス作成方法が異なりますが、`src/lib/supabase` 以下のヘルパー関数を使うことで統一的に扱えます。
+
+**A. クライアントコンポーネント (`use client`) で使う場合:**
+
+```ts
+import { createClient } from '@/lib/supabase/client';
+
+export default function MyComponent() {
+  const supabase = createClient();
+
+  const handleLogin = async () => {
+    await supabase.auth.signInWithOAuth({ provider: 'google' });
+  };
+}
+```
+
+**B. サーバーコンポーネント / Server Actions で使う場合:**
+
+```ts
+import { createClient } from '@/lib/supabase/server';
+
+export default async function Page() {
+  const supabase = createClient();
+  const { data: todos } = await supabase.from('todos').select('\*');
+}
+```
+
+**型定義の生成:**
+
+DBのスキーマを変更したら、以下のコマンドで型定義ファイルを更新できます。 (package.json の script 内の <PROJECT_ID> を自身のIDに書き換えてください)
+
+```Bash
+npm run supabase:gen
+```
+
+---
 
 ## 🧞 Commands
 
