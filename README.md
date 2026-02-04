@@ -1,36 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Next.js + TypeScript + Tailwind CSS Starter Template
 
-## Getting Started
+自分用にカスタマイズした Next.js (App Router) の初期構築テンプレートです。
+開発体験（DX）を重視した設定（Prettier, Tailwind Class Sorting, コンポーネント設計）が適用済みです。
 
-First, run the development server:
+## 🚀 特徴
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Framework**: Next.js 14 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Formatter**: Prettier (with `prettier-plugin-tailwindcss`)
+- **Utility**: `clsx` + `tailwind-merge` (`cn` helper implemented)
+- **Editor**: VS Code settings included (Format on Save enabled)
+
+## 📂 ディレクトリ構成
+
+ソースコードは `src` 配下に集約し、役割ごとに分離しています。
+
+```text
+src/
+├── app/             # ルーティング・ページ本体 (page.tsx, layout.tsx)
+├── components/      # 再利用可能なUIコンポーネント
+│   ├── layouts/     # ヘッダー・フッターなど
+│   └── ui/          # ボタン・入力欄など最小単位のパーツ
+├── hooks/           # カスタムフック
+├── lib/             # ユーティリティ関数・設定 (utils.ts, db.tsなど)
+└── types/           # 型定義ファイル
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ 開発のポイント・ルール（Memo）
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### スタイリングと競合解決 (cn utility)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Tailwind CSS のクラス競合を解決するために、src/lib/utils.ts に cn 関数を用意しています。 コンポーネントを作成する際は、必ずこの cn 関数を通して className を結合してください。
 
-## Learn More
+**なぜ必要なのか？** Tailwind は後から書いたクラスが優先されるとは限りません（CSS定義順依存）。cn を使うことで、親コンポーネントから渡されたクラスで確実にスタイルを上書きできます。
 
-To learn more about Next.js, take a look at the following resources:
+**使用例:**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```TypeScript
+import { cn } from "@/lib/utils";
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+type ButtonProps = {
+  className?: string;
+  children: React.ReactNode;
+};
 
-## Deploy on Vercel
+export function Button({ className, children }: ButtonProps) {
+  return (
+    <button
+      // cnを使うことで、親から bg-red-500 が渡された時に bg-blue-500 を正しく消去・上書きできる
+      className={cn(
+        "rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600",
+        className
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 自動整形 (Prettier & Sorting)
+
+VS Code でファイルを 保存（Save）した瞬間 に、以下の処理が自動で走ります。
+
+1. コードフォーマット: インデントやセミコロンの修正。
+
+2. クラス名の並び替え: Tailwind のクラスが推奨順序に自動整列されます。
+   - 例: class="p-4 flex bg-white" → class="flex bg-white p-4"
+
+**注意点:**
+
+- これを有効にするには、VS Code の拡張機能「Prettier - Code formatter」と「Tailwind CSS IntelliSense」が必要です。
+
+- プロジェクトを開いた時に推奨拡張機能のポップアップが出るので、インストールしてください。
+
+- 手動で全体を整形したい場合は npm run format を実行してください。
+
+---
+
+### 環境変数 (.env)
+
+プロジェクトには .env.example が含まれています。 使用する際は、コピーして .env.local を作成してください。
+
+```Bash
+cp .env.example .env.local
+```
+
+---
+
+### VS Code 設定
+
+.vscode/settings.json により、以下の設定が適用されます。
+
+- **Format On Save**: 保存時に自動整形。
+
+- **Word Wrap**: エディタの右端でコードを折り返し表示（横スクロール防止）。
+
+- **CSS Validation**: Tailwind の独自記法（@tailwind, @apply）による警告を抑制。
+
+## 🧞 Commands
+
+```Bash
+npm run dev      # 開発サーバー起動
+npm run build    # 本番ビルド
+npm run start    # ビルド後の本番起動
+npm run lint     # リントチェック
+npm run format   # Prettierによる手動フォーマット実行
+```
+
+---
