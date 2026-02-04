@@ -103,8 +103,6 @@ cp .env.example .env.local
 
 - **Word Wrap**: エディタの右端でコードを折り返し表示（横スクロール防止）。
 
-- **CSS Validation**: Tailwind の独自記法（@tailwind, @apply）による警告を抑制。
-
 ---
 
 ### Supabase (Database & Auth)
@@ -152,6 +150,46 @@ DBのスキーマを変更したら、以下のコマンドで型定義ファイ
 ```Bash
 npm run supabase:gen
 ```
+
+---
+
+## ✅ 動作確認手順 (Supabase)
+
+プロジェクト作成後、DB接続を確認したい場合は以下の手順を行ってください。
+
+**1. Supabase SQL Editor でテスト用テーブル作成**
+
+```sql
+create table notes (
+  id bigint primary key generated always as identity,
+  title text not null
+);
+insert into notes (title) values ('Connection Test OK');
+alter table notes enable row level security;
+create policy "Public Read" on notes for select using (true);
+```
+
+**2. src/app/page.tsx に一時的に以下を記述**
+
+```TypeScript
+import { createClient } from "@/lib/supabase/server";
+
+export default async function Home() {
+  const supabase = createClient();
+  const { data: notes } = await supabase.from("notes").select("*");
+
+  return (
+    <main className="p-10">
+      <h1 className="text-2xl font-bold mb-4">DB Connection Test</h1>
+      <pre className="bg-gray-100 p-4 rounded">
+        {JSON.stringify(notes, null, 2)}
+      </pre>
+    </main>
+  );
+}
+```
+
+画面に [ { "id": 1, "title": "Connection Test OK" } ] と表示されれば成功です。 確認後は元のコードに戻してください。
 
 ---
 
