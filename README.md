@@ -24,6 +24,7 @@ src/
 ├── lib/
 │   ├── supabase/
 │   │   ├── client.ts
+│   │   ├── oshiMaster.ts
 │   │   └── server.ts
 │   └── utils.ts
 ├── types/
@@ -153,7 +154,7 @@ npm run supabase:gen
 
 ---
 
-## ✅ 動作確認手順 (Supabase)
+### ✅ 動作確認手順 (Supabase)
 
 プロジェクト作成後、DB接続を確認したい場合は以下の手順を行ってください。
 
@@ -190,6 +191,36 @@ export default async function Home() {
 ```
 
 画面に [ { "id": 1, "title": "Connection Test OK" } ] と表示されれば成功です。 確認後は元のコードに戻してください。
+
+---
+
+### 推し活マスタDB (Multi-Database Support)
+
+このプロジェクトは、アプリ固有のデータを管理する **「App DB」** と、複数のアプリで共通利用する推し情報（メンバー情報、動画データなど）を管理する **「Oshi Master DB」** の2つのデータベースに接続可能な構成になっています。
+
+**コンセプト:**
+
+- **App DB**: ユーザー情報、いいね履歴、コメントなど（書き込みメイン）
+- **Oshi Master DB**: 全アプリ共通の推しデータ（読み取り専用マスタ）
+
+---
+
+### 🛠️ 型定義の自動生成 (Type Generation)
+
+DBスキーマを変更した場合、以下の手順で型定義ファイルを更新できます。
+
+1. `package.json` の `scripts` にある `<APP_PROJECT_ID>` と `<MASTER_PROJECT_ID>` を、実際の Supabase Project ID に書き換えてください。
+   （Project ID は Supabase 管理画面の URL `https://supabase.com/dashboard/project/abcde...` の `abcde...` 部分です）
+
+2. Supabase CLI にログインします（初回のみ）。
+   ```bash
+   npx supabase login
+   ```
+3. コマンドを実行して型ファイルを生成します。
+
+   ```Bash
+   npm run supabase:gen
+   ```
 
 ---
 
