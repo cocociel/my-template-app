@@ -26,10 +26,25 @@ src/
 │   │   ├── client.ts
 │   │   ├── oshiMaster.ts
 │   │   └── server.ts
-│   └── utils.ts
+│   ├── utils.ts
+│   └── youtube.ts
 ├── types/
+│   ├── oshiMaster.ts
 │   └── supabase.ts
 └── middleware.ts
+```
+
+## 🧞 Commands
+
+```Bash
+npm run dev      # 開発サーバー起動
+npm run build    # 本番ビルド
+npm run start    # ビルド後の本番起動
+npm run lint     # リントチェック
+npm run format   # Prettierによる手動フォーマット実行
+npm run supabase:gen   # アプリ固有DBおよびマスタDB型定義作成
+npm run supabase:gen:app   # アプリ固有DB型定義作成
+npm run supabase:gen:master   # マスタDB型定義作成
 ```
 
 ## 🛠️ 開発のポイント・ルール（Memo）
@@ -224,17 +239,42 @@ DBスキーマを変更した場合、以下の手順で型定義ファイルを
 
 ---
 
-## 🧞 Commands
+### YouTube Data API
 
-```Bash
-npm run dev      # 開発サーバー起動
-npm run build    # 本番ビルド
-npm run start    # ビルド後の本番起動
-npm run lint     # リントチェック
-npm run format   # Prettierによる手動フォーマット実行
-npm run supabase:gen   # アプリ固有DBおよびマスタDB型定義作成
-npm run supabase:gen:app   # アプリ固有DB型定義作成
-npm run supabase:gen:master   # マスタDB型定義作成
-```
+推しの動画情報などを取得するための設定が含まれています。
+
+**セットアップ:**
+
+1. Google Cloud Console でプロジェクトを作成し、**YouTube Data API v3** を有効化します。
+2. 認証情報から **APIキー** を作成します。
+3. `.env.local` にキーを設定します。
+4. Server Component 内で以下のように使用する。
+
+   ```ts
+     import { getYoutubeClient } from "@/lib/youtube";
+
+     export default async function Page() {
+       const youtube = getYoutubeClient();
+
+       // 例: 特定のチャンネルの最新動画を取得
+       const response = await youtube.search.list({
+         part: ["snippet"],
+         channelId: "CHANNEL_ID_HERE", // 推しのチャンネルID
+         order: "date",
+         maxResults: 5,
+         type: ["video"],
+       });
+
+       const videos = response.data.items;
+
+       return (
+         <ul>
+           {videos?.map((video) => (
+             <li key={video.id?.videoId}>{video.snippet?.title}</li>
+           ))}
+         </ul>
+       );
+     }
+   ```
 
 ---
