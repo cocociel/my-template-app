@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write --ignore-path .gitignore './**/*.{js,jsx,ts,tsx,json,css}'",
-    "supabase:gen": "npx supabase gen types typescript --project-id <PROJECT_ID> > src/types/supabase.ts"
+    "supabase:gen": "npm run supabase:gen:app && npm run supabase:gen:master",
+    "supabase:gen:app": "npx supabase gen types typescript --project-id <APP_PROJECT_ID> > src/types/supabase.ts",
+    "supabase:gen:master": "npx supabase gen types typescript --project-id <MASTER_PROJECT_ID> > src/types/oshiMaster.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",

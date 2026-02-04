@@ -232,6 +232,9 @@ npm run build    # 本番ビルド
 npm run start    # ビルド後の本番起動
 npm run lint     # リントチェック
 npm run format   # Prettierによる手動フォーマット実行
+npm run supabase:gen   # アプリ固有DBおよびマスタDB型定義作成
+npm run supabase:gen:app   # アプリ固有DB型定義作成
+npm run supabase:gen:master   # マスタDB型定義作成
 ```
 
 ---
