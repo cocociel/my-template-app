@@ -8,9 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write --ignore-path .gitignore './**/*.{js,jsx,ts,tsx,json,css}'",
-    "supabase:gen": "npm run supabase:gen:app && npm run supabase:gen:master",
-    "supabase:gen:app": "npx supabase gen types typescript --project-id <APP_PROJECT_ID> > src/types/supabase.ts",
-    "supabase:gen:master": "npx supabase gen types typescript --project-id <MASTER_PROJECT_ID> > src/types/oshiMaster.ts"
+    "supabase:gen": "powershell -Command \"npx supabase gen types typescript --project-id <APP_PROJECT_ID> | Out-File -FilePath src/types/supabase.ts -Encoding utf8\""
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",
